@@ -5,21 +5,25 @@
     <title>Analyllabes</title>
     <link rel="stylesheet" href="style.css">
     <script src="Syllables.js"></script>
-    <script src="index.js"></script>
+    <script src="script.js"></script>
 </head>
 <body>
-    <div>
+    <header>
         <h1>Analyllabes</h1>
-    </div>
-    <div>
-        <div>
-            <input id="Input" type="textarea"></input>
+    </header>
+    <div class="content">
+        <div class="input">
+            <h2>Mots</h2>
+            <textarea id="Input"></textarea>
         </div>
-        <div>
-            <button id="Analyse" onclick="ButtonAnalyse()">Analyser Syllabes</button>
+        <div classe="analyse">
+            <h2 id="NbSyllables" class="hide"></h2>
+            <button id="Analyse" onclick="ButtonAnalyse()">ANALYSER SYLLABES</button>
+            
         </div>
-        <div>
-            <input id="Result" type="textarea" disabled readonly></input>
+        <div class="result">
+            <h2>Syllabes</h2>
+            <textarea id="Result" disabled readonly></textarea>
         </div>
     </div>
 </body>

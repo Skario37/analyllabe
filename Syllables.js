@@ -1,84 +1,101 @@
 const RULES = {
     fr: {
-        separator: [['c','s','c'], ['v','s','c'], ['c', 'c', 's', 'c']],
+        separator: [{
+            cut: ["v", "s", "c"],
+            same: false
+        }, {
+            cut: ["c", "s", "c"],
+            same: false
+        }, {
+            cut: ["c", "c", "s", "c"],
+            same: true, 
+            exception: ["c", "s", "c", "c"]
+        }],
         exception: ['ch', 'ph', 'th', 'gn', 'cr', 'br', 'tr', 'bl', 'cl', 'dr', 'fl', 'fr', 'gl', 'gr', 'pl', 'pr', 'th', 'vr']
     }
 }
 
-function getSyllables(word, lang = "fr") {
-    if (!isString(word)) throw "Not a String.";
+// GOT
+// On ne sépare jamais les groupes de consonnes « ch« , « ph« , « th« , « gn »
+// Si la fin d'un mot se termine que par des consonnes il n'y a pas de coupure
+// Lorsque deux consonnes se suivent, la césure s’effectue entre les deux, ce qui est toujours le cas dès lors qu’elles sont doublées.
+// Lorsque trois consonnes se suivent la coupure doit s’effectuer après la deuxième sauf si on a deux consonnes identiques.
+// La règle générale est de séparer les syllabes entre une voyelle et une consonne.
+// Si les lettres « l » et « r » sont accolées à la deuxième consonne, la coupure doit se faire après la première consonne.
+
+function computefr(str) {
+    const array = [];
+    // RULE N°1
+    // On ne sépare jamais les groupes de consonnes « ch » , « ph » , « th » , « gn »
+    const rule1 = ["ch", "ph", "th", "gn", "zr", "zl", "tr", "tl", "pr", "pl", "dl", "dr", "fr", "fl", "gr", "gl", "kl", "kr", "cr", "cl", "jr", "jl", "qr", "ql", "br", "bl", "vr", "vl"];
+    for (let i = 0; i < str.length; i++) {
+        if (i < str.length - 1) {
+            if (rule1.includes(array[i-1] + str[i])) {
+                array[i-1] += str[i];
+            } else {
+                array.push(str[i]);
+            }
+        } else {
+            array.push(str[i]);
+        }
+    }
+    // END OF RULE N°1
+
+    for (let i = 0; i < array.length; i++) {
+        // RULE N°2
+        // Si la fin d'un mot se termine que par des consonnes il n'y a pas de coupure
+        if ((array.slice(i)).every(v => !isVowel(v))) {
+            const delArray = array.splice(i, array.length-1);
+            array.push(delArray.join(""));
+        }
+        // END OF RULE N°2
+
+        // RULE N°3
+        // Lorsque deux consonnes se suivent, la césure s’effectue entre les deux, ce qui est toujours le cas dès lors qu’elles sont doublées.
+        if (i < array.length - 1 && !isVowel(array[i]) && !isVowel(array[i+1])) {
+            if (i >= array.length - 2 || isVowel(array[i+2])) {
+                array.splice(i+1, 0, "¤");
+                i += 1;
+            } else {
+
+                // RULE N°4
+                // Lorsque trois consonnes se suivent la coupure doit s’effectuer après la deuxième sauf si on a deux consonnes identiques.
+                if (array[i] === array[i+1] && array[i]) {
+                    array.splice(i+1, 0, "¤");
+                } else {
+                    array.splice(i+2, 0, "¤");
+                }
+                i += 2;
+                // END OF RULE N°4
+            }
+        // END OF RULE N°3
+
+        // RULE N°5
+        // La règle générale est de séparer les syllabes entre une voyelle et une consonne.
+        } else if (i < array.length - 2 && isVowel(array[i]) && !isVowel(array[i+1]) && isVowel(array[i+2])) {
+            array.splice(i+1, 0, "¤")
+            i++;
+        }
+    }
+
+
+    
+    return array.join("").split("¤");
+}
+
+function getSyllables(string, lang = "fr") {
+    if (!isString(string)) throw "Not a String.";
     lang = lang.toLowerCase();
 
-    const syllables = [];
-    const vorcs = [];
-    
-    // Identify every char as consonant or vowel
-    let appliedRule = [];
-    for (let char of word) {
-        vorcs.push(vorcFromBool(isVowel(char)));
+    let syllables = [];
+    for (const w of string.split(" ")) {
+        switch (lang) { 
+            case "fr": 
+            default:
+                syllables = [...syllables, ...computefr(w)];
+                break;
+        }
     }
-
-    let construct = ''; // Used to keep in memory some characters while constructing a syllable
-    let shift = 0; // Used to iterate over word and so
-    while (shift < word.length) {
-        if (shift === 0) {
-            construct += word.slice(shift, shift + 1);
-            shift ++;
-            continue;
-        }
-        // Look for rule to apply
-        appliedRule = -1;
-        for (let sepRules of RULES[lang].separator) {
-            const sepRule = sepRules.filter(r => r !== "s").join('');
-            const sepCons = vorcs.slice(shift, sepRule.length + shift).join('');
-            if (sepCons === sepRule) appliedRule = sepRules;
-        }
-
-        if (appliedRule.length) {
-            const beforeSep = appliedRule.slice(0, appliedRule.findIndex(e => e === "s")); // Get the part before separator
-            const sepWord = word.slice(shift, beforeSep.length + shift);
-            if (!RULES[lang].exception.includes(construct + sepWord)) {
-                if (!(vorcs.slice(shift + beforeSep.length)).every(e => e === "c")) { 
-                    // Set actual as a syllable (need of construct + sepWord)
-                    console.log(sepWord, 'hey')
-                    syllables.push(construct + sepWord);
-                    // Shift to actual separator length
-                    shift += beforeSep.length;
-                    construct = '';
-                } else { 
-                    // If every remaining characters of the word is consonant
-                    // Set the whole remaining characters as a syllable
-                    console.log(word.slice(shift), 'heyo')
-                    syllables.push(construct + word.slice(shift));
-                    construct = '';
-                    break;
-                }
-            } else { 
-                // Shift by the length of the part before rule separator 
-                shift += beforeSep.length;
-                // Set construct as the exception 
-                construct = sepWord;
-            }
-            
-        } else { // Add character to construct if no rule to apply (especially for first char)
-            construct += word.slice(shift, shift + 1);
-            shift++;
-        }
-        
-    }
-    if (construct.length > 0) syllables.push(construct);
-
-    // Loop for every single chars 
-    const ret = [];
-    // let unshift = 0;
-    // for(let i = 0; i < syllables.length; i++) {
-    //     if (syllables[i].length === 1) {
-    //         ret[i - 1 - unshift] += syllables[i];
-    //         unshift++;
-    //     } else {
-    //         ret.push(syllables[i]);
-    //     }
-    // }
 
     return syllables;
 }
@@ -88,6 +105,7 @@ function isString(a) {
 }
 
 function isVowel(s) {
+    s = s.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Enlève les diacritiques
     return (/^[aeiou]$/i).test(s);
 }
 
