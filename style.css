@@ -46,18 +46,19 @@ h2 {
     width: 100%;
 }
 
-.content div {
+.content .input, .content .result {
     min-width: 15%;
     max-width: 30%;
     text-align: center;
 }
 
-.analyse {
-    height: 700px;
+.content .analyse {
+    min-width: 30%;
+    text-align: center;
 }
 
 textarea {
-    max-width: 100%;
+    max-width: 90%;
     height: 100px;
     max-height: 700px;
     background-color: rgb(51, 39, 22);
@@ -67,7 +68,8 @@ textarea {
 }
 
 button {
-    width: 50%;
+    width: 90%;
+    max-width: 100px;
     height: 48px;
     transition-duration: 0.4s;
     background-color: rgb(51, 39, 22);
@@ -75,6 +77,10 @@ button {
     box-shadow: rgb(0 0 0 / 20%) 0px 2px 4px 0px;
     color: white;
     border-radius: 5px;
+    padding: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 button:hover {
