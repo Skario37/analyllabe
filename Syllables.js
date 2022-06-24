@@ -5,7 +5,7 @@ const VOWELS = {
 const GRP_EXCEPTION = ["ch", "ph", "th", "gn", "zr", "zl", "tr", "tl", "pr", "pl", "dl", "dr", "fr", "fl", "gr", "gl", "kl", "kr", "cr", "cl", "jr", "jl", "qr", "ql", "br", "bl", "vr", "vl", "m.", "mm.", "mr.", "mrs.", "miss.", "ms."];
 
 function computefr(str) {
-    const array = [];
+    let array = [];
     // RULE N°1
     // On ne sépare jamais les groupes de consonnes « ch » , « ph » , « th » , « gn »
     let j = 0;
@@ -79,7 +79,13 @@ function computefr(str) {
     }
     // END OF RULE N°5
 
-    return array.join("").split("¤");
+    array = array.join("").split("¤");
+
+    if (array.length > 1 && isStrFullConsonant(array[0])) {
+        array[0] = array.shift() + array[0];
+    }
+
+    return array;
 }
 
 function getSyllables(string, lang = "fr") {
