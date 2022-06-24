@@ -1,3 +1,10 @@
+/*
+* Prefixed by https://autoprefixer.github.io
+* PostCSS: v8.4.14,
+* Autoprefixer: v10.4.7
+* Browsers: last 4 version
+*/
+
 html {
     font-size: 14px;
 }
@@ -9,6 +16,7 @@ body {
     overflow-x: hidden;
     min-width: 320px;
     font-family: Rajdhani, sans-serif;
+    display: -ms-grid;
     display: grid;
     background-color: rgb(143, 110, 67);
 }
@@ -18,13 +26,20 @@ body, html {
 }
 
 header {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
     padding-top: 20px;
     padding-bottom: 20px;
-    align-items: center;
-    justify-content: center;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
     background-color: rgb(62, 107, 107);
-    box-shadow: rgb(0 0 0 / 20%) 0px 2px 4px 0px;
+    -webkit-box-shadow: rgb(0 0 0 / 20%) 0px 2px 4px 0px;
+            box-shadow: rgb(0 0 0 / 20%) 0px 2px 4px 0px;
 }
 
 h1 {
@@ -38,10 +53,19 @@ h2 {
 
 .content {
     margin: auto;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: row;
+            flex-direction: row;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
     min-height: calc(100vh - 170px);
     width: 100%;
 }
@@ -64,22 +88,27 @@ textarea {
     background-color: rgb(51, 39, 22);
     color: white;
     border-radius: 5px;
-    box-shadow: rgb(0 0 0 / 20%) 0px 2px 4px 0px;
+    -webkit-box-shadow: rgb(0 0 0 / 20%) 0px 2px 4px 0px;
+            box-shadow: rgb(0 0 0 / 20%) 0px 2px 4px 0px;
 }
 
 button {
     width: 90%;
     max-width: 100px;
     height: 48px;
-    transition-duration: 0.4s;
+    -webkit-transition-duration: 0.4s;
+         -o-transition-duration: 0.4s;
+            transition-duration: 0.4s;
     background-color: rgb(51, 39, 22);
     border: 1px solid gray;
-    box-shadow: rgb(0 0 0 / 20%) 0px 2px 4px 0px;
+    -webkit-box-shadow: rgb(0 0 0 / 20%) 0px 2px 4px 0px;
+            box-shadow: rgb(0 0 0 / 20%) 0px 2px 4px 0px;
     color: white;
     border-radius: 5px;
     padding: 2px;
     overflow: hidden;
-    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+       text-overflow: ellipsis;
     white-space: nowrap;
 }
 
