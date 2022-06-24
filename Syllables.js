@@ -1,19 +1,7 @@
-const RULES = {
-    fr: {
-        separator: [{
-            cut: ["v", "s", "c"],
-            same: false
-        }, {
-            cut: ["c", "s", "c"],
-            same: false
-        }, {
-            cut: ["c", "c", "s", "c"],
-            same: true, 
-            exception: ["c", "s", "c", "c"]
-        }],
-        exception: ['ch', 'ph', 'th', 'gn', 'cr', 'br', 'tr', 'bl', 'cl', 'dr', 'fl', 'fr', 'gl', 'gr', 'pl', 'pr', 'th', 'vr']
-    }
+const VOWELS = {
+    fr: new RegExp(/^[aeiouy]$/i)
 }
+
 
 // GOT
 // On ne sépare jamais les groupes de consonnes « ch« , « ph« , « th« , « gn »
@@ -44,7 +32,7 @@ function computefr(str) {
     for (let i = 0; i < array.length; i++) {
         // RULE N°2
         // Si la fin d'un mot se termine que par des consonnes il n'y a pas de coupure
-        if ((array.slice(i)).every(v => !isVowel(v))) {
+        if ((array.slice(i)).every(v => !isVowel(v, 'fr'))) {
             const delArray = array.splice(i, array.length-1);
             array.push(delArray.join(""));
         }
@@ -52,8 +40,8 @@ function computefr(str) {
 
         // RULE N°3
         // Lorsque deux consonnes se suivent, la césure s’effectue entre les deux, ce qui est toujours le cas dès lors qu’elles sont doublées.
-        if (i < array.length - 1 && !isVowel(array[i]) && !isVowel(array[i+1])) {
-            if (i >= array.length - 2 || isVowel(array[i+2])) {
+        if (i < array.length - 1 && !isVowel(array[i], 'fr') && !isVowel(array[i+1], 'fr')) {
+            if (i >= array.length - 2 || isVowel(array[i+2], 'fr')) {
                 array.splice(i+1, 0, "¤");
                 i += 1;
             } else {
@@ -72,13 +60,12 @@ function computefr(str) {
 
         // RULE N°5
         // La règle générale est de séparer les syllabes entre une voyelle et une consonne.
-        } else if (i < array.length - 2 && isVowel(array[i]) && !isVowel(array[i+1]) && isVowel(array[i+2])) {
+        } else if (i < array.length - 2 && isVowel(array[i], 'fr') && !isVowel(array[i+1], 'fr') && isVowel(array[i+2], 'fr')) {
             array.splice(i+1, 0, "¤")
             i++;
         }
+        // END OF RULE N°5
     }
-
-
     
     return array.join("").split("¤");
 }
@@ -104,9 +91,9 @@ function isString(a) {
     return typeof a === "string" || a instanceof String;
 }
 
-function isVowel(s) {
+function isVowel(s, lang) {
     s = s.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Enlève les diacritiques
-    return (/^[aeiou]$/i).test(s);
+    return VOWELS[lang].test(s);
 }
 
 function vorcFromBool(b) {

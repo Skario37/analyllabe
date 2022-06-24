@@ -2,17 +2,28 @@
 <html lang="fr">
 <head>
     <meta charset="utf-8">
-<<<<<<< HEAD
-    <meta name="image" content="logo.png">
-=======
-    <meta name="image" content="favicon.ico">
->>>>>>> 06e7ba0c78cd5f0123040ad39ab2377e066e3820
-    <meta name="title" content="Analyllabe">
-    <meta name="description" content="Analyseur de syllabes">
-    <meta name="keywords" content="syllabe, syllabes, javascript, js">
+    <!-- Primary Meta Tags -->
+    <title>SyLab — Le labo des syllabes</title>
+    <meta name="title" content="SyLab — Le labo des syllabes">
+    <meta name="description" content="Avec SyLab vous saurez comment découper vos mots en syllabes (écrites).">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skario37.github.io/sylab/">
+    <meta property="og:title" content="SyLab — Le labo des syllabes">
+    <meta property="og:description" content="Avec SyLab vous saurez comment découper vos mots en syllabes (écrites).">
+    <meta property="og:image" content="https://raw.githubusercontent.com/Skario37/sylab/main/logo.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://skario37.github.io/sylab/">
+    <meta property="twitter:title" content="SyLab — Le labo des syllabes">
+    <meta property="twitter:description" content="Avec SyLab vous saurez comment découper vos mots en syllabes (écrites).">
+    <meta property="twitter:image" content="https://raw.githubusercontent.com/Skario37/sylab/main/logo.png">
+
+    <!--  -->
     <meta name="author" content="Skario">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analyllabes</title>
     <link rel="icon" href="favicon.ico" />
     <link rel="stylesheet" href="style.css">
     <script src="Syllables.js"></script>
@@ -20,16 +31,16 @@
 </head>
 <body>
     <header>
-        <h1>Analyllabes</h1>
+        <h1>SyLab</h1>
     </header>
     <div class="content">
         <div class="input">
             <h2>Mots</h2>
             <textarea id="Input"></textarea>
         </div>
-        <div classe="analyse">
+        <div class="analyse">
             <h2 id="NbSyllables" class="hide"></h2>
-            <button id="Analyse" onclick="ButtonAnalyse()">ANALYSER SYLLABES</button>
+            <button id="Analyse" onclick="ButtonAnalyse()">ANALYSER</button>
             
         </div>
         <div class="result">
