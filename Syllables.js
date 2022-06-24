@@ -2,46 +2,48 @@ const VOWELS = {
     fr: new RegExp(/^[aeiouy]$/i)
 }
 
-
-// GOT
-// On ne sépare jamais les groupes de consonnes « ch« , « ph« , « th« , « gn »
-// Si la fin d'un mot se termine que par des consonnes il n'y a pas de coupure
-// Lorsque deux consonnes se suivent, la césure s’effectue entre les deux, ce qui est toujours le cas dès lors qu’elles sont doublées.
-// Lorsque trois consonnes se suivent la coupure doit s’effectuer après la deuxième sauf si on a deux consonnes identiques.
-// La règle générale est de séparer les syllabes entre une voyelle et une consonne.
-// Si les lettres « l » et « r » sont accolées à la deuxième consonne, la coupure doit se faire après la première consonne.
+const GRP_EXCEPTION = ["ch", "ph", "th", "gn", "zr", "zl", "tr", "tl", "pr", "pl", "dl", "dr", "fr", "fl", "gr", "gl", "kl", "kr", "cr", "cl", "jr", "jl", "qr", "ql", "br", "bl", "vr", "vl", "m.", "mm.", "mr.", "mrs.", "miss.", "ms."];
 
 function computefr(str) {
     const array = [];
     // RULE N°1
     // On ne sépare jamais les groupes de consonnes « ch » , « ph » , « th » , « gn »
-    const rule1 = ["ch", "ph", "th", "gn", "zr", "zl", "tr", "tl", "pr", "pl", "dl", "dr", "fr", "fl", "gr", "gl", "kl", "kr", "cr", "cl", "jr", "jl", "qr", "ql", "br", "bl", "vr", "vl"];
+    let j = 0;
     for (let i = 0; i < str.length; i++) {
-        if (i < str.length - 1) {
-            if (rule1.includes(array[i-1] + str[i])) {
-                array[i-1] += str[i];
-            } else {
-                array.push(str[i]);
+        let grp_applied = '';
+        for (let k = 0; k < GRP_EXCEPTION.length; k++) {
+            if ((array[j-1] + str.slice(i)).length >= GRP_EXCEPTION[k].length && grp_applied.length < GRP_EXCEPTION[k].length) {
+                if ((array[j-1] + str.slice(i, i + GRP_EXCEPTION[k].length - 1)).toLowerCase() === GRP_EXCEPTION[k]) {
+                    grp_applied = GRP_EXCEPTION[k];
+                }
             }
-        } else {
-            array.push(str[i]);
         }
+        
+        if (grp_applied.length === 0) {
+            array.push(str[i]);
+        } else {
+            array[j-1] = grp_applied;
+            i += grp_applied.length - 2;
+            j--;
+        }
+        j++;
     }
     // END OF RULE N°1
 
     for (let i = 0; i < array.length; i++) {
         // RULE N°2
         // Si la fin d'un mot se termine que par des consonnes il n'y a pas de coupure
-        if ((array.slice(i)).every(v => !isVowel(v, 'fr'))) {
+        if ((array.slice(i)).every(v => !isVowel(v))) {
             const delArray = array.splice(i, array.length-1);
             array.push(delArray.join(""));
+            break;
         }
         // END OF RULE N°2
 
         // RULE N°3
         // Lorsque deux consonnes se suivent, la césure s’effectue entre les deux, ce qui est toujours le cas dès lors qu’elles sont doublées.
-        if (i < array.length - 1 && !isVowel(array[i], 'fr') && !isVowel(array[i+1], 'fr')) {
-            if (i >= array.length - 2 || isVowel(array[i+2], 'fr')) {
+        if (i < array.length - 1 && !isVowel(array[i]) && !isVowel(array[i+1])) {
+            if (i >= array.length - 2 || isVowel(array[i+2])) {
                 array.splice(i+1, 0, "¤");
                 i += 1;
             } else {
@@ -57,16 +59,26 @@ function computefr(str) {
                 // END OF RULE N°4
             }
         // END OF RULE N°3
-
-        // RULE N°5
-        // La règle générale est de séparer les syllabes entre une voyelle et une consonne.
-        } else if (i < array.length - 2 && isVowel(array[i], 'fr') && !isVowel(array[i+1], 'fr') && isVowel(array[i+2], 'fr')) {
-            array.splice(i+1, 0, "¤")
-            i++;
-        }
-        // END OF RULE N°5
+        } 
+        
     }
     
+    // RULE N°5
+    // La règle générale est de séparer les syllabes entre une voyelle et une consonne.
+    for (let i = 0; i < array.length; i++) {        
+        if (i < array.length - 2 && isVowel(array[i])) {
+            if (array[i+1].length > 1 && !isStrFullConsonant(array[i+1]) && (isVowel(array[i+2]) || array[i+2] === "¤")) {
+                array.splice(i+1, 0, "¤")
+                i++;
+            } else if (!isVowel(array[i+1]) && isVowel(array[i+2])) {
+                
+                array.splice(i+1, 0, "¤")
+                i++;
+            }
+        }
+    }
+    // END OF RULE N°5
+
     return array.join("").split("¤");
 }
 
@@ -75,7 +87,8 @@ function getSyllables(string, lang = "fr") {
     lang = lang.toLowerCase();
 
     let syllables = [];
-    for (const w of string.split(" ")) {
+    for (let w of string.split(" ")) {
+        w = w.replace(/(\r\n|\n|\r)/gm, "");
         switch (lang) { 
             case "fr": 
             default:
@@ -91,11 +104,29 @@ function isString(a) {
     return typeof a === "string" || a instanceof String;
 }
 
-function isVowel(s, lang) {
+function isVowel(s, lang="fr") {
     s = s.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Enlève les diacritiques
     return VOWELS[lang].test(s);
 }
 
-function vorcFromBool(b) {
-    return b?"v":"c";
+function isStrFullVowel(s, lang="fr") {
+    let ret = true;
+    for (const c of s) {
+        if (!isVowel(c, lang)) {
+            ret = false;
+            break;
+        }
+    }
+    return ret;
+}
+
+function isStrFullConsonant(s, lang="fr") {
+    let ret = true;
+    for (const c of s) {
+        if (isVowel(c, lang)) {
+            ret = false;
+            break;
+        }
+    }
+    return ret;
 }
