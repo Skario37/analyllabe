@@ -14,7 +14,7 @@ function computefr(str) {
         for (let k = 0; k < GRP_EXCEPTION.length; k++) {
             if ((array[j-1] + str.slice(i)).length >= GRP_EXCEPTION[k].length && grp_applied.length < GRP_EXCEPTION[k].length) {
                 if ((array[j-1] + str.slice(i, i + GRP_EXCEPTION[k].length - 1)).toLowerCase() === GRP_EXCEPTION[k]) {
-                    grp_applied = GRP_EXCEPTION[k];
+                    grp_applied = array[j-1] + str.slice(i, i + GRP_EXCEPTION[k].length - 1);
                 }
             }
         }
@@ -62,7 +62,7 @@ function computefr(str) {
         } 
         
     }
-    
+
     // RULE N°5
     // La règle générale est de séparer les syllabes entre une voyelle et une consonne.
     for (let i = 0; i < array.length; i++) {        
